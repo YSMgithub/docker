@@ -1,0 +1,28 @@
+FROM nginx
+
+COPY ./part_4/Makefile /server/
+COPY ./part_4/mini_server.c /server/
+COPY ./part_4/start.sh /server/
+COPY ./part_4/nginx.conf /etc/nginx/nginx.conf
+
+RUN apt-get update \
+	&& apt-get install -y gcc \
+	make \
+	bash \
+	libfcgi-dev \
+	spawn-fcgi \
+	&& rm -rf /var/lib/apt/lists \
+	&& chown -R nginx:nginx /server \
+	&& chmod -R 755 /server \
+	&& chown -R nginx:nginx /var/cache/nginx \
+	&& chown -R nginx:nginx /var/log/nginx \
+	&& chown -R nginx:nginx /etc/nginx/conf.d \
+	&& touch var/run/nginx.pid \
+	&& chown -R nginx:nginx /var/run/nginx.pid
+    
+USER nginx
+    
+WORKDIR /server/
+    
+ENTRYPOINT [ "./start.sh" ]
+
